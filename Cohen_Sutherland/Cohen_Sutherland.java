@@ -3,8 +3,34 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package CSE_423_lab_2;
+package CSE_423_lab_2.Cohen_Sutherland;
 
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.glu.GLU;
+
+/**
+ *
+ * @author User
+ */
+//public class Cohen_Sutherland {
+//    int x1, y1, x2, y2;
+//    
+//    public Cohen_Sutherland(int x1, int y1, int x2, int y2){
+//        this.x1 = x1;
+//        this.x2 = x2;
+//        this.y1 = y1;
+//        this.y2 = y2;
+//        
+//        int x= 000;
+//        int y = 010;
+//        int z = 010;
+//        System.out.println(x & y);
+//        System.out.println(z & y);
+//        System.out.println(z & x);
+//    }
+//}
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
@@ -23,7 +49,7 @@ import java.util.Scanner;
  * @author Saadat
  * this implements the MidPoint Line drawing algorithm
  */
-public class MidPoint_Line implements GLEventListener {
+public class Cohen_Sutherland implements GLEventListener {
     
         /**
      * Interface to the GLU library.
@@ -53,23 +79,22 @@ public class MidPoint_Line implements GLEventListener {
     @Override
     public void display(GLAutoDrawable drawable) {
         GL2 gl = drawable.getGL().getGL2();
-
+        
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
         /*
          * put your code here
          */
-        MidPoint(gl, -100, -100, 0, 150);
-	MidPoint(gl, 100, -100, 0, 150);
-        
-        MidPoint(gl, -130, 100, 130, 100);
-        MidPoint(gl, 130, 100, -130, 100);
-        
-        MidPoint(gl, -130, 100, 100, -100); // doesn't work
-        MidPoint(gl, 100, -100, -130, 100);
-        
-        MidPoint(gl, -100, -100, 130, 100);
         
         
+        MidPoint(gl,-100, 100, -100, -100);
+	MidPoint(gl,100, 100, -100, 100);
+        
+        MidPoint(gl, 100, 100, 100, -100);
+        MidPoint(gl, 100, -100, -100, -100);
+
+        
+//        clip(gl, int x0, int y0, int x1, int y1, int x_max,int x_min,int y_max,int y_min);
+        clip(gl, 0, 0, 90, 90, 120, -100, 100, -100);
 
         
 
@@ -83,6 +108,69 @@ public class MidPoint_Line implements GLEventListener {
     public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
         //do nothing
     }
+    
+    public void clip(GL2 gl, int x0, int y0, int x1, int y1, int x_max,int x_min,int y_max,int y_min){
+        int T = 0B10000;
+        int B = 0B0100;
+        int L = 0B0001;
+        int R = 0B0110;
+        int code = 0B0000;
+        int code0 = 0B0000;
+        int code1 = 0B0000;
+        double m = (y1-y0)/(x1-x0);
+        code0 = makeCode(x0, y0, x_max, x_min, y_max, y_min);
+        code1 = makeCode(x1, y1, x_max, x_min, y_max, y_min);
+        while(true){
+            if(code0 + code1 == 0){
+                MidPoint(gl, x0, y0, x1, y1);
+                break;
+            }
+            else if((code0&code1)>0){
+                break;
+            }
+            else{
+                int x,y;
+                if(code0>0){
+                    code=code0;
+                    x=x0;
+                    y=y0;
+                }else{
+                    code=code1;
+                    x=x1;
+                    y=y1;
+                }
+                
+                if((code&T)>0){
+                    y=y_max;
+                    x=(int) ((1/m)*(y_max-y0));
+                }
+                else if((code&B)>0){
+                    y=y_min;
+                    x=(int) ((1/m)*(y_min-y0));
+                }
+                if((code&R)>0){
+                    x=x_max;
+                    y=(int) ((m)*(x_max-x0));
+                }
+                else if((code&L)>0){
+                    x=x_min;
+                    y=(int) ((m)*(x_min-x0));
+                }
+                if(code == code0){
+                    x0 = x;
+                    y0 = y;
+                    code0= makeCode(x, y, x_max, x_min, y_max, y_min);
+                }
+                else{
+                    x1 = x;
+                    y1 = y;
+                    code1= makeCode(x, y, x_max, x_min, y_max, y_min);
+                }
+            }
+            
+        }
+    }
+    
 
     private void MidPoint(GL2 gl, int x1, int y1, int x2, int y2) {
         
@@ -183,6 +271,22 @@ public class MidPoint_Line implements GLEventListener {
         }
         
     }
+    
+    public int makeCode(int x, int y,int x_max,int x_min,int y_max,int y_min){
+        int code = 0B0000;
+        if(x<x_min){ // L
+            code += 0B0001;
+        }else if(x>x_max){ // R
+            code += 0B0010;
+        }
+        if(y<y_min){ //B
+            code += 0B0100;
+        }else if(y>y_max){ // T
+            code += 0B1000;
+        }
+        return code;
+    }
+    
     private void WritePixel(GL2 gl,int x, int y, int zone){
     if(zone == 0){gl.glVertex2i(x , y );}
     else if(zone == 1){gl.glVertex2i(y , x );}
@@ -200,3 +304,4 @@ public class MidPoint_Line implements GLEventListener {
     }
     
 }
+

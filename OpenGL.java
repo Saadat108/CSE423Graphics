@@ -69,9 +69,9 @@ public class OpenGL {
       
 //      DDALines drawing = new DDALines();    // for DDA algorithm calling
       
-//      MidPoint_Line drawing = new MidPoint_Line();  // for MidPoint algo calling
+      MidPoint_Line drawing = new MidPoint_Line();  // for MidPoint algo calling
       
-      MidPointCircle drawing = new MidPointCircle();
+//      MidPointCircle drawing = new MidPointCircle();
       
       glcanvas.addGLEventListener(drawing);
       glcanvas.setSize(500, 500);

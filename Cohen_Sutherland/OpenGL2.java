@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package CSE_423_lab_2;
+package CSE_423_lab_2.Cohen_Sutherland;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -71,7 +71,7 @@ public class OpenGL2 {
       
 //      MidPoint_Line drawing = new MidPoint_Line();  // for MidPoint algo calling
       
-      MidPointCircle drawing = new MidPointCircle();
+      Cohen_Sutherland drawing = new Cohen_Sutherland();
       
       glcanvas.addGLEventListener(drawing);
       glcanvas.setSize(500, 500);
